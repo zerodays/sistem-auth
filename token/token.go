@@ -20,19 +20,19 @@ type Claims struct {
 var signingKey *rsa.PublicKey
 
 // Validate checks if token is valid and returns its claims.
-func Validate(accessToken string) (Claims, error) {
-	token, err := jwt.ParseWithClaims(accessToken, Claims{}, func(_ *jwt.Token) (interface{}, error) {
+func Validate(accessToken string) (*Claims, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &Claims{}, func(_ *jwt.Token) (interface{}, error) {
 		return signingKey, nil
 	})
 
 	if err != nil {
-		return Claims{}, err
+		return nil, err
 	}
 
-	if claims, ok := token.Claims.(Claims); ok && token.Valid {
+	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
 		return claims, nil
 	} else {
-		return Claims{}, ErrInvalidToken
+		return nil, ErrInvalidToken
 	}
 }
 

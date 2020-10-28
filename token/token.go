@@ -2,11 +2,14 @@ package token
 
 import (
 	"crypto/rsa"
+	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/zerodays/sistem-auth/permission"
 	"io/ioutil"
 	"net/http"
 )
+
+var ErrInvalidToken = errors.New("invalid token")
 
 type Claims struct {
 	jwt.StandardClaims
@@ -18,7 +21,7 @@ var signingKey *rsa.PublicKey
 
 // Validate checks if token is valid and returns its claims.
 func Validate(accessToken string) (Claims, error) {
-	token, err := jwt.Parse(accessToken, func(_ *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(accessToken, Claims{}, func(_ *jwt.Token) (interface{}, error) {
 		return signingKey, nil
 	})
 
@@ -26,7 +29,11 @@ func Validate(accessToken string) (Claims, error) {
 		return Claims{}, err
 	}
 
-	return token.Claims.(Claims), nil
+	if claims, ok := token.Claims.(Claims); ok && token.Valid {
+		return claims, nil
+	} else {
+		return Claims{}, ErrInvalidToken
+	}
 }
 
 // LoadKey loads RSA public key used for verifying access tokens from specified url.

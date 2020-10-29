@@ -7,7 +7,7 @@ import (
 
 type User struct {
 	UID         string
-	Permissions []permission.Permission
+	Permissions []permission.Type
 }
 
 // FromToken returns user from access token. If access token is not valid,
@@ -26,12 +26,18 @@ func FromToken(accessToken string) (*User, error) {
 }
 
 // HasPermission checks if user has permission perm.
-func (u *User) HasPermission(perm permission.Permission) bool {
-	for _, p := range u.Permissions {
-		if p == perm {
-			return true
+func (u *User) HasPermissions(perms ...permission.Type) bool {
+	has := true
+	for _, perm := range perms {
+		found := false
+		for _, p := range u.Permissions {
+			if p.Code == perm.Code {
+				found = true
+				break
+			}
 		}
+		has = found && has
 	}
 
-	return false
+	return has
 }

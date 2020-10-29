@@ -14,7 +14,7 @@ var ErrInvalidToken = errors.New("invalid token")
 type Claims struct {
 	jwt.StandardClaims
 
-	Permissions []permission.Permission `json:"permissions"`
+	Permissions []permission.Type `json:"permissions"`
 }
 
 var signingKey *rsa.PublicKey

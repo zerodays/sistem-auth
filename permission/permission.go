@@ -1,15 +1,31 @@
 package permission
 
-type Permission string
+type Type struct {
+	Code                string
+	ImplicitPermissions []Type
+}
 
-const (
-	UserRead       Permission = "user:read"
-	UserWrite      Permission = "user:write"
-	InventoryRead  Permission = "inventory:read"
-	InventoryWrite Permission = "inventory:write"
+var (
+	UserRead = Type{
+		Code:                "user:read",
+		ImplicitPermissions: nil,
+	}
+	UserWrite = Type{
+		Code:                "user:write",
+		ImplicitPermissions: []Type{UserRead},
+	}
+
+	InventoryRead = Type{
+		Code:                "inventory:read",
+		ImplicitPermissions: nil,
+	}
+	InventoryWrite = Type{
+		Code:                "inventory:write",
+		ImplicitPermissions: []Type{InventoryRead},
+	}
 )
 
-var All = []Permission{
+var All = []Type{
 	UserRead,
 	UserWrite,
 	InventoryRead,
